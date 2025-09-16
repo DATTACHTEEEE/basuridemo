@@ -1,99 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Basuri Player</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo </title>
 <style>
-body{background:#0f1724;color:#f1f5f9;font-family:sans-serif;margin:0;padding:20px;}
-h1{margin:0 0 12px;text-align:center}
-.card{background:#1e293b;border-radius:12px;padding:20px;max-width:600px;margin:20px auto;box-shadow:0 6px 16px rgba(0,0,0,.4)}
-label,select{display:block;margin-bottom:12px;font-size:1rem}
-select{width:100%;padding:8px;border-radius:8px;border:none;background:#334155;color:#f8fafc}
-.controls{display:flex;gap:10px;margin-top:12px}
-button{flex:1;padding:10px;border:none;border-radius:8px;font-weight:600;cursor:pointer}
-button.play{background:#22c55e;color:#fff}
-button.stop{background:#ef4444;color:#fff}
-.range{width:100%;margin-top:14px}
-.time{display:flex;justify-content:space-between;font-size:.9rem;color:#cbd5e1}
+  body{
+    background:#222; color:#fff; font-family:Arial, sans-serif;
+    display:flex; justify-content:center; align-items:center;
+    height:100vh; margin:0;
+  }
+  .player{
+    background:#333; border:4px solid #666;
+    border-radius:20px; padding:30px;
+    width:340px; text-align:center;
+    box-shadow:0 0 20px #000;
+  }
+  .screen{
+    background:#0a0; color:#0f0;
+    font-family:'Courier New', monospace;
+    padding:10px; margin-bottom:20px;
+    border-radius:6px; font-size:18px;
+    min-height:30px;
+  }
+  .controls button{
+    width:70px; height:70px;
+    margin:0 8px; border:none; border-radius:50%;
+    font-size:16px; cursor:pointer; color:#fff;
+    box-shadow:0 4px 6px rgba(0,0,0,0.4);
+  }
+  .prev{background:#ff1900;}
+  .play{background:#27ae60;}
+  .next{background:#3498db;}
+  select, input[type="range"]{
+    width:100%; margin-top:15px;
+  }
+  .extra{
+    margin-top:20px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .extra button{
+    background:#f1c40f; border:none;
+    border-radius:6px; padding:6px 12px;
+    cursor:pointer; font-weight:bold;
+  }
 </style>
 </head>
 <body>
-  <h1>Phát tiếng kèn Basuri</h1>
-  <div class="card">
-    <label for="trackSelect">Chọn bài kèn:</label>
-    <select id="trackSelect">
-      <option value="snap1.mp3">Basuri 1</option>
-      <option value="snap2.mp3">Basuri 2</option>
-      <option value="snap3.mp3">Basuri 3</option>
-      <option value="basuri4.mp3">Basuri 4</option>
-    </select>
+  <div class="player">
+    <div class="screen" id="display">Chọn bài hát…</div>
 
+    <!-- Nút điều khiển -->
     <div class="controls">
-      <button id="playBtn" class="play">▶ Play</button>
-      <button id="stopBtn" class="stop">⏹ Stop</button>
+      <button class="prev" id="prev">◀</button>
+      <button class="play" id="play">▶/⏸</button>
+      <button class="next" id="next">▶</button>
     </div>
 
-    <input id="seek" class="range" type="range" value="0" min="0" max="100">
-    <div class="time"><span id="current">0:00</span><span id="duration">0:00</span></div>
+    <!-- Danh sách bài hát -->
+    <select id="trackList">
+      <option value="snap1.mp3">Lấy Cây Kim May Đồ</option>
+      <option value="bacphan.mp3">Bạc Phận</option>
+      <option value="henhodemtrang.mp3">hẹn hò đêm trăng</option>
+      <option value="basuri4.mp3">World Cup</option>
+      <option value="melody12.mp3">Melody 12 loa</option>
+      <option value="doraemon.mp3">Doraemon</option>
+    </select>
+
+    <!-- Âm lượng -->
+    <label>Âm lượng:
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+    </label>
+
+    <!-- Tốc độ -->
+    <div class="extra">
+      <button id="slower">– tốc độ</button>
+      <span id="speedDisplay">1.0x</span>
+      <button id="faster">+ tốc độ</button>
+    </div>
+
+    <audio id="player"></audio>
   </div>
 
 <script>
-const trackSelect=document.getElementById('trackSelect');
-const playBtn=document.getElementById('playBtn');
-const stopBtn=document.getElementById('stopBtn');
-const seek=document.getElementById('seek');
-const cur=document.getElementById('current');
-const dur=document.getElementById('duration');
+const audio = document.getElementById('player');
+const display = document.getElementById('display');
+const trackList = document.getElementById('trackList');
+const volumeSlider = document.getElementById('volume');
+const speedDisplay = document.getElementById('speedDisplay');
 
-let audio=new Audio();
-let timer=null;
+// Danh sách bài hát
+const tracks = [
+  {name:'Lấy Cây Kim May Đồ', file:'snap1.mp3'},
+  {name:'Bạc Phận', file:'bacphan.mp3'},
+  {name:'hẹn hò đêm trăng', file:'henhodemtrang.mp3'},
+  {name:'World Cup', file:'basuri4.mp3'},
+  {name:'Melody 12 loa', file:'melody12.mp3'},
+  {name:'Doraemon', file:'doraemon.mp3'}
+];
 
-function formatTime(s){
-  const m=Math.floor(s/60);
-  const sec=Math.floor(s%60).toString().padStart(2,'0');
-  return `${m}:${sec}`;
+let current = 0;
+
+function loadTrack(i){
+  current = i;
+  audio.src = tracks[i].file;
+  display.textContent = tracks[i].name;
+  trackList.value = tracks[i].file;
 }
 
-function loadTrack(){
-  audio.src = trackSelect.value;
-  audio.load();
-  audio.addEventListener('loadedmetadata',()=>{
-    dur.textContent = formatTime(audio.duration);
-    seek.value = 0;
-    cur.textContent="0:00";
-  },{once:true});
-}
-loadTrack();
-
-trackSelect.addEventListener('change',()=>{ stopAudio(); loadTrack(); });
-
-function playAudio(){
-  audio.play();
-  timer=setInterval(()=>{
-    if(audio.duration){
-      seek.value = (audio.currentTime / audio.duration) * 100;
-      cur.textContent = formatTime(audio.currentTime);
-    }
-  },500);
-}
-function stopAudio(){
-  audio.pause();
-  audio.currentTime = 0;
-  clearInterval(timer);
-  seek.value=0;
-  cur.textContent="0:00";
-}
-
-playBtn.onclick=()=>playAudio();
-stopBtn.onclick=()=>stopAudio();
-
-seek.oninput=()=>{
-  if(audio.duration){
-    audio.currentTime = (seek.value/100) * audio.duration;
-    cur.textContent = formatTime(audio.currentTime);
-  }
+// Nút play/pause
+document.getElementById('play').onclick = ()=>{
+  if(audio.paused) audio.play();
+  else audio.pause();
 };
+
+// Nút prev/next
+document.getElementById('prev').onclick = ()=>{
+  loadTrack((current - 1 + tracks.length) % tracks.length);
+  audio.play();
+};
+document.getElementById('next').onclick = ()=>{
+  loadTrack((current + 1) % tracks.length);
+  audio.play();
+};
+
+// Chọn bài trong select
+trackList.onchange = ()=>{
+  const i = tracks.findIndex(t=>t.file===trackList.value);
+  loadTrack(i);
+};
+
+// Âm lượng
+volumeSlider.oninput = ()=>{
+  audio.volume = volumeSlider.value;
+};
+
+// Tốc độ
+let rate = 1.0;
+document.getElementById('slower').onclick = ()=>{
+  rate = Math.max(0.5, rate - 0.1);
+  audio.playbackRate = rate;
+  speedDisplay.textContent = rate.toFixed(1)+'x';
+};
+document.getElementById('faster').onclick = ()=>{
+  rate = Math.min(2.0, rate + 0.1);
+  audio.playbackRate = rate;
+  speedDisplay.textContent = rate.toFixed(1)+'x';
+};
+
+// Mặc định load bài đầu
+loadTrack(0);
 </script>
 </body>
 </html>
+
