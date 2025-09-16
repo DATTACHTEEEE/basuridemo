@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Demo </title>
+<title>Demo</title>
 <style>
   body{
     background:#222; color:#fff; font-family:Arial, sans-serif;
-    display:flex; justify-content:center; align-items:center;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
     height:100vh; margin:0;
   }
   .player{
@@ -44,20 +44,28 @@
     border-radius:6px; padding:6px 12px;
     cursor:pointer; font-weight:bold;
   }
+  footer{
+    margin-top:20px;
+    text-align:center;
+    color:#ccc;
+    font-size:14px;
+  }
+  footer span{
+    color:#f1c40f;
+    font-weight:bold;
+  }
 </style>
 </head>
 <body>
   <div class="player">
     <div class="screen" id="display">Chọn bài hát…</div>
 
-    <!-- Nút điều khiển -->
     <div class="controls">
       <button class="prev" id="prev">◀</button>
       <button class="play" id="play">▶/⏸</button>
       <button class="next" id="next">▶</button>
     </div>
 
-    <!-- Danh sách bài hát -->
     <select id="trackList">
       <option value="snap1.mp3">Lấy Cây Kim May Đồ</option>
       <option value="bacphan.mp3">Bạc Phận</option>
@@ -67,12 +75,10 @@
       <option value="doraemon.mp3">Doraemon</option>
     </select>
 
-    <!-- Âm lượng -->
     <label>Âm lượng:
       <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
     </label>
 
-    <!-- Tốc độ -->
     <div class="extra">
       <button id="slower">– tốc độ</button>
       <span id="speedDisplay">1.0x</span>
@@ -82,6 +88,10 @@
     <audio id="player"></audio>
   </div>
 
+  <footer>
+    © Bản quyền <span>Đạt Tạch Tè 92 QN</span> – Donate: <span>0798770822 MB Bank Tên: Ly Vinh pls hãy donate</span>
+  </footer>
+
 <script>
 const audio = document.getElementById('player');
 const display = document.getElementById('display');
@@ -89,7 +99,6 @@ const trackList = document.getElementById('trackList');
 const volumeSlider = document.getElementById('volume');
 const speedDisplay = document.getElementById('speedDisplay');
 
-// Danh sách bài hát
 const tracks = [
   {name:'Lấy Cây Kim May Đồ', file:'snap1.mp3'},
   {name:'Bạc Phận', file:'bacphan.mp3'},
@@ -108,13 +117,11 @@ function loadTrack(i){
   trackList.value = tracks[i].file;
 }
 
-// Nút play/pause
 document.getElementById('play').onclick = ()=>{
   if(audio.paused) audio.play();
   else audio.pause();
 };
 
-// Nút prev/next
 document.getElementById('prev').onclick = ()=>{
   loadTrack((current - 1 + tracks.length) % tracks.length);
   audio.play();
@@ -124,18 +131,15 @@ document.getElementById('next').onclick = ()=>{
   audio.play();
 };
 
-// Chọn bài trong select
 trackList.onchange = ()=>{
   const i = tracks.findIndex(t=>t.file===trackList.value);
   loadTrack(i);
 };
 
-// Âm lượng
 volumeSlider.oninput = ()=>{
   audio.volume = volumeSlider.value;
 };
 
-// Tốc độ
 let rate = 1.0;
 document.getElementById('slower').onclick = ()=>{
   rate = Math.max(0.5, rate - 0.1);
@@ -148,10 +152,11 @@ document.getElementById('faster').onclick = ()=>{
   speedDisplay.textContent = rate.toFixed(1)+'x';
 };
 
-// Mặc định load bài đầu
 loadTrack(0);
 </script>
 </body>
 </html>
+
+
 
 
