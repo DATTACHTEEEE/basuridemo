@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Basuri Player</title>
+<style>
+body{background:#0f1724;color:#f1f5f9;font-family:sans-serif;margin:0;padding:20px;}
+h1{margin:0 0 12px;text-align:center}
+.card{background:#1e293b;border-radius:12px;padding:20px;max-width:600px;margin:20px auto;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+label,select{display:block;margin-bottom:12px;font-size:1rem}
+select{width:100%;padding:8px;border-radius:8px;border:none;background:#334155;color:#f8fafc}
+.controls{display:flex;gap:10px;margin-top:12px}
+button{flex:1;padding:10px;border:none;border-radius:8px;font-weight:600;cursor:pointer}
+button.play{background:#22c55e;color:#fff}
+button.stop{background:#ef4444;color:#fff}
+.range{width:100%;margin-top:14px}
+.time{display:flex;justify-content:space-between;font-size:.9rem;color:#cbd5e1}
+</style>
+</head>
+<body>
+  <h1>Phát tiếng kèn Basuri</h1>
+  <div class="card">
+    <label for="trackSelect">Chọn bài kèn:</label>
+    <select id="trackSelect">
+      <option value="snap1.mp3">Basuri 1</option>
+      <option value="snap2.mp3">Basuri 2</option>
+      <option value="snap3.mp3">Basuri 3</option>
+      <option value="basuri4.mp3">Basuri 4</option>
+    </select>
+
+    <div class="controls">
+      <button id="playBtn" class="play">▶ Play</button>
+      <button id="stopBtn" class="stop">⏹ Stop</button>
+    </div>
+
+    <input id="seek" class="range" type="range" value="0" min="0" max="100">
+    <div class="time"><span id="current">0:00</span><span id="duration">0:00</span></div>
+  </div>
+
+<script>
+const trackSelect=document.getElementById('trackSelect');
+const playBtn=document.getElementById('playBtn');
+const stopBtn=document.getElementById('stopBtn');
+const seek=document.getElementById('seek');
+const cur=document.getElementById('current');
+const dur=document.getElementById('duration');
+
+let audio=new Audio();
+let timer=null;
+
+function formatTime(s){
+  const m=Math.floor(s/60);
+  const sec=Math.floor(s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function loadTrack(){
+  audio.src = trackSelect.value;
+  audio.load();
+  audio.addEventListener('loadedmetadata',()=>{
+    dur.textContent = formatTime(audio.duration);
+    seek.value = 0;
+    cur.textContent="0:00";
+  },{once:true});
+}
+loadTrack();
+
+trackSelect.addEventListener('change',()=>{ stopAudio(); loadTrack(); });
+
+function playAudio(){
+  audio.play();
+  timer=setInterval(()=>{
+    if(audio.duration){
+      seek.value = (audio.currentTime / audio.duration) * 100;
+      cur.textContent = formatTime(audio.currentTime);
+    }
+  },500);
+}
+function stopAudio(){
+  audio.pause();
+  audio.currentTime = 0;
+  clearInterval(timer);
+  seek.value=0;
+  cur.textContent="0:00";
+}
+
+playBtn.onclick=()=>playAudio();
+stopBtn.onclick=()=>stopAudio();
+
+seek.oninput=()=>{
+  if(audio.duration){
+    audio.currentTime = (seek.value/100) * audio.duration;
+    cur.textContent = formatTime(audio.currentTime);
+  }
+};
+</script>
+</body>
+</html>
