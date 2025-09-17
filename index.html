@@ -193,7 +193,7 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
     result.textContent = "Đang kiểm tra...";
     try {
         // Đổi URL bên dưới thành link thật của version.json trên GitHub Pages
-        const res = await fetch("https://dattachteeee.github.io/basuridemo/version.json" + Date.now());
+        const res = await fetch("https://raw.githubusercontent.com/DATTACHTEEEE/basuridemo/refs/heads/main/version.json" + Date.now());
         const data = await res.json();
         if (data.version && data.version !== currentVersion) {
             result.textContent = `Có bản mới ${data.version} – cập nhật lần cuối: ${data.lastUpdate}`;
@@ -207,3 +207,4 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
 </script>
 </body>
 </html>
+
