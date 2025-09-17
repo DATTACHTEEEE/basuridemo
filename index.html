@@ -10,10 +10,10 @@
     background:#222; color:#fff; font-family:Arial, sans-serif;
     display:flex; flex-direction:column; justify-content:center; align-items:center;
     height:100vh; margin:0;
-    overflow:hidden;                 /* chặn cuộn */
-    user-select:none;                /* chặn bôi đen */
+    overflow:hidden;
+    user-select:none;
     -webkit-user-drag:none;
-    touch-action:none;               /* chặn thao tác kéo */
+    touch-action:none;
   }
   .player{
     background:#333; border:4px solid #666;
@@ -51,6 +51,24 @@
     border-radius:6px; padding:6px 12px;
     cursor:pointer; font-weight:bold;
   }
+  .update-box{
+    margin-top:20px;
+    text-align:center;
+  }
+  .update-box button{
+    background:#1abc9c;
+    border:none;
+    padding:8px 14px;
+    border-radius:6px;
+    color:#fff;
+    cursor:pointer;
+    font-weight:bold;
+  }
+  .update-box p{
+    margin-top:10px;
+    font-size:14px;
+    color:#f1c40f;
+  }
   footer{
     margin-top:20px;
     text-align:center;
@@ -64,7 +82,7 @@
   }
 </style>
 </head>
-<body oncontextmenu="return false"> <!-- chặn menu chuột phải -->
+<body oncontextmenu="return false">
 
   <div class="player">
     <div class="screen" id="display">Chọn bài hát…</div>
@@ -94,11 +112,17 @@
       <button id="faster">+ tốc độ</button>
     </div>
 
+    <!-- Nút kiểm tra cập nhật -->
+    <div class="update-box">
+      <button id="checkUpdateBtn">Kiểm tra cập nhật</button>
+      <p id="updateResult"></p>
+    </div>
+
     <audio id="player"></audio>
   </div>
 
   <footer>
-    © Bản quyền <span>Đạt Tạch Tè 92 QN</span> – Donate: 
+    © Bản quyền <span>Đạt Tạch Tè 92 QN</span> – Donate:
     <span>0798770822 MB Bank Tên: Ly Vinh</span>
   </footer>
 
@@ -161,8 +185,25 @@ document.getElementById('faster').onclick = ()=>{
 };
 
 loadTrack(0);
+
+// --- Kiểm tra cập nhật ---
+const currentVersion = "1.0.0"; // phiên bản hiện tại của web
+document.getElementById("checkUpdateBtn").addEventListener("click", async () => {
+    const result = document.getElementById("updateResult");
+    result.textContent = "Đang kiểm tra...";
+    try {
+        // Đổi URL bên dưới thành link thật của version.json trên GitHub Pages
+        const res = await fetch("https://dattachteeee.github.io/basuridemo/version.json" + Date.now());
+        const data = await res.json();
+        if (data.version && data.version !== currentVersion) {
+            result.textContent = `Có bản mới ${data.version} – cập nhật lần cuối: ${data.lastUpdate}`;
+        } else {
+            result.textContent = `Đang ở bản mới nhất (Cập nhật lần cuối: ${data.lastUpdate})`;
+        }
+    } catch (e) {
+        result.textContent = "Không kiểm tra được (lỗi mạng hoặc file version.json).";
+    }
+});
 </script>
 </body>
 </html>
-
-
