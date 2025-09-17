@@ -2,19 +2,25 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Demo</title>
 <style>
-  body{
+  html,body{
     background:#222; color:#fff; font-family:Arial, sans-serif;
     display:flex; flex-direction:column; justify-content:center; align-items:center;
     height:100vh; margin:0;
+    overflow:hidden;                 /* chặn cuộn */
+    user-select:none;                /* chặn bôi đen */
+    -webkit-user-drag:none;
+    touch-action:none;               /* chặn thao tác kéo */
   }
   .player{
     background:#333; border:4px solid #666;
     border-radius:20px; padding:30px;
     width:340px; text-align:center;
     box-shadow:0 0 20px #000;
+    position:relative;
   }
   .screen{
     background:#0a0; color:#0f0;
@@ -22,6 +28,7 @@
     padding:10px; margin-bottom:20px;
     border-radius:6px; font-size:18px;
     min-height:30px;
+    pointer-events:none;
   }
   .controls button{
     width:70px; height:70px;
@@ -49,6 +56,7 @@
     text-align:center;
     color:#ccc;
     font-size:14px;
+    pointer-events:none;
   }
   footer span{
     color:#f1c40f;
@@ -56,7 +64,8 @@
   }
 </style>
 </head>
-<body>
+<body oncontextmenu="return false"> <!-- chặn menu chuột phải -->
+
   <div class="player">
     <div class="screen" id="display">Chọn bài hát…</div>
 
@@ -89,7 +98,8 @@
   </div>
 
   <footer>
-    © Bản quyền <span>Đạt Tạch Tè 92 QN</span> – Donate: <span>0798770822 MB Bank Tên: Ly Vinh pls hãy donate</span>
+    © Bản quyền <span>Đạt Tạch Tè 92 QN</span> – Donate: 
+    <span>0798770822 MB Bank Tên: Ly Vinh</span>
   </footer>
 
 <script>
@@ -136,9 +146,7 @@ trackList.onchange = ()=>{
   loadTrack(i);
 };
 
-volumeSlider.oninput = ()=>{
-  audio.volume = volumeSlider.value;
-};
+volumeSlider.oninput = ()=> audio.volume = volumeSlider.value;
 
 let rate = 1.0;
 document.getElementById('slower').onclick = ()=>{
@@ -156,7 +164,3 @@ loadTrack(0);
 </script>
 </body>
 </html>
-
-
-
-
