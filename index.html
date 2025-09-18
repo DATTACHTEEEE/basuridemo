@@ -193,7 +193,7 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
   result.textContent = "Đang kiểm tra...";
   try {
     const res = await fetch(
-      "https://dattacheteeee.github.io/basuridemo/version.json?nocache=" + Date.now()
+      "https://raw.githubusercontent.com/DATTACHTEEEE/basuridemo/main/version.json?nocache=" + Date.now()
     );
     const data = await res.json();
 
@@ -212,4 +212,5 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
 </script>
 </body>
 </html>
+
 
