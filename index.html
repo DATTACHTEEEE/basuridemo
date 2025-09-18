@@ -206,9 +206,10 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
         `Đang ở bản mới nhất (Cập nhật lần cuối: ${data.updated}${next})`;
     }
   } catch (e) {
-    result.textContent = "Không kiểm tra được (lỗi mạng hoặc file version.json).";
+    result.textContent = "Lỗi Kết Nối Vui Lòng Thử Lại Sau.";
   }
 });
 </script>
 </body>
 </html>
+
