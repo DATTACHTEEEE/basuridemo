@@ -143,6 +143,7 @@ const tracks = [
 ];
 
 let current = 0;
+
 function loadTrack(i){
   current = i;
   audio.src = tracks[i].file;
@@ -150,10 +151,25 @@ function loadTrack(i){
   trackList.value = tracks[i].file;
 }
 
-document.getElementById('play').onclick = ()=> audio.paused ? audio.play() : audio.pause();
-document.getElementById('prev').onclick = ()=>{ loadTrack((current - 1 + tracks.length)%tracks.length); audio.play(); };
-document.getElementById('next').onclick = ()=>{ loadTrack((current + 1)%tracks.length); audio.play(); };
-trackList.onchange = ()=> loadTrack(tracks.findIndex(t=>t.file===trackList.value));
+document.getElementById('play').onclick = ()=>{
+  if(audio.paused) audio.play();
+  else audio.pause();
+};
+
+document.getElementById('prev').onclick = ()=>{
+  loadTrack((current - 1 + tracks.length) % tracks.length);
+  audio.play();
+};
+document.getElementById('next').onclick = ()=>{
+  loadTrack((current + 1) % tracks.length);
+  audio.play();
+};
+
+trackList.onchange = ()=>{
+  const i = tracks.findIndex(t=>t.file===trackList.value);
+  loadTrack(i);
+};
+
 volumeSlider.oninput = ()=> audio.volume = volumeSlider.value;
 
 let rate = 1.0;
@@ -167,8 +183,11 @@ document.getElementById('faster').onclick = ()=>{
   audio.playbackRate = rate;
   speedDisplay.textContent = rate.toFixed(1)+'x';
 };
+
 loadTrack(0);
-const currentVersion = "1.0.0"; // phiên bản hiện tại
+
+// ===== Kiểm tra cập nhật =====
+const currentVersion = "1.0.0"; // phiên bản hiện tại của web
 document.getElementById("checkUpdateBtn").addEventListener("click", async () => {
   const result = document.getElementById("updateResult");
   result.textContent = "Đang kiểm tra...";
@@ -179,11 +198,12 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
     const data = await res.json();
 
     if (data.version && data.version !== currentVersion) {
-      result.textContent = `Có bản mới ${data.version} - cập nhật lần cuối: ${data.updated}`;
+      result.textContent =
+        `Có bản mới ${data.version} – cập nhật lần cuối: ${data.updated}`;
     } else {
-      // lấy cả nextUpdate nếu có
       const next = data.nextUpdate ? ` | Cập nhật tiếp theo: ${data.nextUpdate}` : "";
-      result.textContent = `Đang ở bản mới nhất (Cập nhật lần cuối: ${data.updated}${next})`;
+      result.textContent =
+        `Đang ở bản mới nhất (Cập nhật lần cuối: ${data.updated}${next})`;
     }
   } catch (e) {
     result.textContent = "Không kiểm tra được (lỗi mạng hoặc file version.json).";
@@ -192,7 +212,3 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
 </script>
 </body>
 </html>
-
-
-
-
