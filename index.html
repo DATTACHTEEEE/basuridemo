@@ -169,30 +169,30 @@ document.getElementById('faster').onclick = ()=>{
 };
 loadTrack(0);
 
-// ===== Kiểm tra cập nhật =====
-const currentVersion = "1.0.0";   // phiên bản hiện tại của web
+      const currentVersion = "1.0.0"; // phiên bản hiện tại
 document.getElementById("checkUpdateBtn").addEventListener("click", async () => {
-    const result = document.getElementById("updateResult");
-    result.textContent = "Đang kiểm tra...";
-    try {
-        // dùng link GitHub Pages của bạn và thêm ?nocache
-        const res = await fetch(
-          "https://dattachteeee.github.io/basuridemo/version.json?nocache=" + Date.now()
-        );
-        const data = await res.json();
+  const result = document.getElementById("updateResult");
+  result.textContent = "Đang kiểm tra...";
+  try {
+    const res = await fetch(
+      "https://dattacheteeee.github.io/basuridemo/version.json?nocache=" + Date.now()
+    );
+    const data = await res.json();
 
-        // file version.json của bạn có { "version": "...", "updated": "..." }
-        if (data.version && data.version !== currentVersion) {
-            result.textContent = `Có bản mới ${data.version} – cập nhật lần cuối: ${data.updated}`;
-        } else {
-            result.textContent = `Đang ở bản mới nhất (Cập nhật lần cuối: ${data.updated})`;
-        }
-    } catch (e) {
-        result.textContent = "Không kiểm tra được (lỗi mạng hoặc file version.json).";
+    if (data.version && data.version !== currentVersion) {
+      result.textContent = `Có bản mới ${data.version} - cập nhật lần cuối: ${data.updated}`;
+    } else {
+      // lấy cả nextUpdate nếu có
+      const next = data.nextUpdate ? ` | Cập nhật tiếp theo: ${data.nextUpdate}` : "";
+      result.textContent = `Đang ở bản mới nhất (Cập nhật lần cuối: ${data.updated}${next})`;
     }
+  } catch (e) {
+    result.textContent = "Không kiểm tra được (lỗi mạng hoặc file version.json).";
+  }
 });
 </script>
 </body>
 </html>
+
 
 
