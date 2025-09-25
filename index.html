@@ -6,7 +6,6 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Basuri Việt Nam</title>
 <style>
-  /* giữ nguyên CSS cũ của bạn */
   html,body{
     margin:0;
     height:100vh;
@@ -14,7 +13,7 @@
     justify-content:center;
     align-items:center;
     background:url("anhxetai.jpg");
-    background-size:cover;
+    background-size:cover;          
     font-family:Arial, sans-serif;
     color:#fff;
     user-select:none;
@@ -22,18 +21,82 @@
     touch-action:none;
     overflow:hidden;
   }
-  /* …các style khác không đổi… */
+  .player{
+    background:rgba(0,0,0,0.6);
+    border:4px solid #666;
+    border-radius:20px;
+    padding:30px;
+    width: 700px;
+    text-align:center;
+    box-shadow:0 0 20px #000;
+    position:relative;
+  }
+  .screen{
+    background:#0a0;
+    color:#0f0;
+    font-family:'Courier New', monospace;
+    padding:10px;
+    margin-bottom:20px;
+    border-radius:6px;
+    font-size:18px;
+    min-height:30px;
+    pointer-events:none;
+  }
+  .controls button{
+    width:70px; height:70px;
+    margin:0 8px; border:none; border-radius:50%;
+    font-size:16px; cursor:pointer; color:#fff;
+    box-shadow:0 4px 6px rgba(0,0,0,0.4);
+  }
+  .prev{background:#ff1900;}
+  .play{background:#27ae60;}
+  .next{background:#3498db;}
+  select, input[type="range"]{
+    width:100%; margin-top:15px;
+  }
+  .extra{
+    margin-top:20px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .extra button{
+    background:#f1c40f; border:none;
+    border-radius:6px; padding:6px 12px;
+    cursor:pointer; font-weight:bold;
+  }
+  .update-box{
+    margin-top:20px;
+    text-align:center;
+  }
+  .update-box button{
+    background:#1abc9c;
+    border:none;
+    padding:8px 14px;
+    border-radius:6px;
+    color:#fff;
+    cursor:pointer;
+    font-weight:bold;
+  }
+  .update-box p{
+    margin-top:10px;
+    font-size:14px;
+    color:#f1c40f;
+  }
+  footer{
+    margin-top:20px;
+    text-align:center;
+    color:#ccc;
+    font-size:14px;
+    pointer-events:none;
+  }
+  footer span{
+    color:#f1c40f;
+    font-weight:bold;
+  }
 </style>
 </head>
 <body oncontextmenu="return false">
 
   <div class="player">
-    <button class="help-btn" id="helpBtn">?</button>
-    <div class="popup" id="popup">
-      <button class="discord" onclick="window.open('https://discord.gg/avqA64e4','_blank')">Tham gia Discord</button>
-      <button class="zalo" onclick="window.open('https://zalo.me/g/wmstib433','_blank')">Tham gia Zalo</button>
-    </div>
-
     <div class="screen" id="display">Chọn bài hát…</div>
 
     <div class="controls">
@@ -42,17 +105,25 @@
       <button class="next" id="next">▶</button>
     </div>
 
-    <!-- ĐÃ thêm 2 option mới -->
     <select id="trackList">
       <option value="snap1.mp3">Lấy Cây Kim May Đồ</option>
       <option value="bacphan.mp3">Bạc Phận</option>
       <option value="henhodemtrang.mp3">Hẹn Hò Đêm Trăng</option>
       <option value="basuri4.mp3">World Cup</option>
       <option value="melody12.mp3">Melody 12 loa</option>
+      <option value="nuavangtrang.mp3">Nửa Vằng Trăng</option>
+      <option value="dragosteadin">dragostea din</option>
+      <option value="2muamua.mp3">2 Mùa Mưa</option>
+      <option value="trumua.mp3">Trú Mưa</option>
+      <option value="tinhyeucuatoi.mp3">Tình Yêu Của Tôi</option>
+      <option value="henhodemtrangv7.mp3">Hẹn Hò Đêm Trăng V7</option>
+      <option value="teenvongco.mp3">Teen Vòng Cổ</option>
+      <option value="muathuytinh.mp3">Mưa Thuỷ Tinh</option>
+      <option value="3proremix.mp3">3Pro Remix</option>
+      <option value="ngayanhba.mp3">Ngày Anh Ba</option>
+      <option value="troubleisafriend.mp3">trouble is a friend</option>
+      <option value="bukitberbunga.mp3">bukit berbunga</option>
       <option value="doraemon.mp3">Doraemon</option>
-      <option value="meloditamvan.mp3">Melodi TamVan</option>
-      <option value="tinhanhem.mp3">Tình Anh Em</option> 
-      <option value="ngokhongv7.mp3">Ngộ Không V7</option>
     </select>
 
     <label>Âm lượng:
@@ -65,6 +136,7 @@
       <button id="faster">+ tốc độ</button>
     </div>
 
+    <!-- Nút kiểm tra cập nhật -->
     <div class="update-box">
       <button id="checkUpdateBtn">Kiểm tra cập nhật</button>
       <p id="updateResult"></p>
@@ -85,17 +157,25 @@ const trackList = document.getElementById('trackList');
 const volumeSlider = document.getElementById('volume');
 const speedDisplay = document.getElementById('speedDisplay');
 
-// ĐÃ thêm 2 bài mới vào mảng tracks
 const tracks = [
   {name:'Lấy Cây Kim May Đồ', file:'snap1.mp3'},
   {name:'Bạc Phận', file:'bacphan.mp3'},
   {name:'Hẹn Hò Đêm Trăng', file:'henhodemtrang.mp3'},
   {name:'World Cup', file:'basuri4.mp3'},
   {name:'Melody 12 loa', file:'melody12.mp3'},
-  {name:'Doraemon', file:'doraemon.mp3'},
-  {name:'Melodi TamVan', file:'meloditamvan.mp3'},
-  {name:'Tình Anh Em', file:'tinhanhem.mp3'},
-  {name:'Ngộ Không V7', file:'ngokhongv7.mp3'}
+  {name:'Nửa Vằng Trăng', file:'nuavangtrang.mp3'},
+  {name:'dragostea din', file:'dragosteadin.mp3'},
+  {name:'2 Mùa Mưa', file:'2muamua.mp3'},
+  {name:'Trú Mưa', file:'trumua.mp3'},
+  {name:'Tình Yêu Của Tôi', file:'tinhyeucuatoi.mp3'},
+  {name:'Hẹn Hò Đêm Trăng V7', file:'henhodemtrangv7.mp3'},
+  {name:'Teen Vòng Cổ', file:'teenvongco.mp3'},
+  {name:'Mưa Thuỷ Tinh', file:'muathuytinh.mp3'},
+  {name:'3Pro Remix', file:'3proremix.mp3'},
+  {name:'Ngày Anh Ba', file:'ngayanhba.mp3'},
+  {name:'trouble is a friend', file:'troubleisafriend.mp3'},
+  {name:'bukit berbunga', file:'bukitberbunga.mp3'},
+  {name:'Doraemon', file:'doraemon.mp3'}
 ];
 
 let current = 0;
@@ -107,10 +187,25 @@ function loadTrack(i){
   trackList.value = tracks[i].file;
 }
 
-document.getElementById('play').onclick = ()=> audio.paused ? audio.play() : audio.pause();
-document.getElementById('prev').onclick = ()=>{ loadTrack((current-1+tracks.length)%tracks.length); audio.play(); };
-document.getElementById('next').onclick = ()=>{ loadTrack((current+1)%tracks.length); audio.play(); };
-trackList.onchange = ()=> loadTrack(tracks.findIndex(t=>t.file===trackList.value));
+document.getElementById('play').onclick = ()=>{
+  if(audio.paused) audio.play();
+  else audio.pause();
+};
+
+document.getElementById('prev').onclick = ()=>{
+  loadTrack((current - 1 + tracks.length) % tracks.length);
+  audio.play();
+};
+document.getElementById('next').onclick = ()=>{
+  loadTrack((current + 1) % tracks.length);
+  audio.play();
+};
+
+trackList.onchange = ()=>{
+  const i = tracks.findIndex(t=>t.file===trackList.value);
+  loadTrack(i);
+};
+
 volumeSlider.oninput = ()=> audio.volume = volumeSlider.value;
 
 let rate = 1.0;
@@ -124,15 +219,18 @@ document.getElementById('faster').onclick = ()=>{
   audio.playbackRate = rate;
   speedDisplay.textContent = rate.toFixed(1)+'x';
 };
+
 loadTrack(0);
 
-// kiểm tra cập nhật (giữ nguyên)
-const currentVersion = "1.0.0";
+// ===== Kiểm tra cập nhật =====
+const currentVersion = "1.0.0"; // phiên bản hiện tại
 document.getElementById("checkUpdateBtn").addEventListener("click", async () => {
   const result = document.getElementById("updateResult");
   result.textContent = "Đang kiểm tra...";
   try {
-    const res = await fetch("https://raw.githubusercontent.com/DATTACHTEEEE/basuridemo/main/version.json?nocache=" + Date.now());
+    const res = await fetch(
+      "https://raw.githubusercontent.com/DATTACHTEEEE/basuridemo/main/version.json?nocache=" + Date.now()
+    );
     const data = await res.json();
     if (data.version && data.version !== currentVersion) {
       result.textContent = `Có bản mới ${data.version} – cập nhật lần cuối: ${data.updated}`;
@@ -144,14 +242,8 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
     result.textContent = "Lỗi kết nối, vui lòng thử lại sau.";
   }
 });
-
-// popup toggle
-const helpBtn = document.getElementById("helpBtn");
-const popup = document.getElementById("popup");
-helpBtn.onclick = ()=>{
-  popup.style.display = popup.style.display==="block" ? "none" : "block";
-};
 </script>
 </body>
 </html>
+
 
