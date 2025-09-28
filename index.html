@@ -13,7 +13,7 @@
     justify-content:center;
     align-items:center;
     background:url("anhxetai.jpg");
-    background-size:cover;          
+    background-size:cover;
     font-family:Arial, sans-serif;
     color:#fff;
     user-select:none;
@@ -26,7 +26,7 @@
     border:4px solid #666;
     border-radius:20px;
     padding:30px;
-    width: 700px;
+    width:700px;
     text-align:center;
     box-shadow:0 0 20px #000;
     position:relative;
@@ -92,11 +92,44 @@
     color:#f1c40f;
     font-weight:bold;
   }
+
+  /* ===== Huy hiệu người nghe ===== */
+  .listener-box{
+    position:absolute;
+    top:-15px; right:-15px;
+    background:rgba(0,200,0,0.85);
+    padding:6px 12px;
+    border-radius:20px;
+    font-weight:bold;
+    color:#fff;
+    font-size:16px;
+    box-shadow:0 0 8px rgba(0,0,0,0.4);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .listener-box .dot{
+    width:10px; height:10px;
+    background:#0f0;
+    border-radius:50%;
+    animation:pulse 1.5s infinite;
+  }
+  @keyframes pulse{
+    0%{transform:scale(1); opacity:1;}
+    50%{transform:scale(1.4); opacity:0.6;}
+    100%{transform:scale(1); opacity:1;}
+  }
 </style>
 </head>
 <body oncontextmenu="return false">
 
   <div class="player">
+    <!-- Huy hiệu người nghe -->
+    <div class="listener-box">
+      <span class="dot"></span>
+      <span id="listenerCount">0</span> người đang nghe
+    </div>
+
     <div class="screen" id="display">Chọn bài hát…</div>
 
     <div class="controls">
@@ -112,7 +145,7 @@
       <option value="basuri4.mp3">World Cup</option>
       <option value="melody12.mp3">Melody 12 loa</option>
       <option value="nuavantrang.mp3">Nửa Vằng Trăng</option>
-      <option value="dragosteadin">dragostea din</option>
+      <option value="dragosteadin.mp3">dragostea din</option>
       <option value="2muamua.mp3">2 Mùa Mưa</option>
       <option value="trumua.mp3">Trú Mưa</option>
       <option value="tinhyeucuatoi.mp3">Tình Yêu Của Tôi</option>
@@ -137,7 +170,6 @@
       <button id="faster">+ tốc độ</button>
     </div>
 
-    <!-- Nút kiểm tra cập nhật -->
     <div class="update-box">
       <button id="checkUpdateBtn">Kiểm tra cập nhật</button>
       <p id="updateResult"></p>
@@ -170,7 +202,7 @@ const tracks = [
   {name:'Trú Mưa', file:'trumua.mp3'},
   {name:'Tình Yêu Của Tôi', file:'tinhyeucuatoi.mp3'},
   {name:'Hẹn Hò Đêm Trăng V7', file:'henhodemtrangv7.mp3'},
-  {name:'Teen Vọng Cổ ', file:'teenvongco.mp3'},
+  {name:'Teen Vọng Cổ', file:'teenvongco.mp3'},
   {name:'Mưa Thuỷ Tinh', file:'muathuytinh.mp3'},
   {name:'3Pro Remix', file:'3proremix.mp3'},
   {name:'Ngày Anh Ba', file:'ngayanhba.mp3'},
@@ -181,7 +213,6 @@ const tracks = [
 ];
 
 let current = 0;
-
 function loadTrack(i){
   current = i;
   audio.src = tracks[i].file;
@@ -193,7 +224,6 @@ document.getElementById('play').onclick = ()=>{
   if(audio.paused) audio.play();
   else audio.pause();
 };
-
 document.getElementById('prev').onclick = ()=>{
   loadTrack((current - 1 + tracks.length) % tracks.length);
   audio.play();
@@ -202,12 +232,10 @@ document.getElementById('next').onclick = ()=>{
   loadTrack((current + 1) % tracks.length);
   audio.play();
 };
-
 trackList.onchange = ()=>{
   const i = tracks.findIndex(t=>t.file===trackList.value);
   loadTrack(i);
 };
-
 volumeSlider.oninput = ()=> audio.volume = volumeSlider.value;
 
 let rate = 1.0;
@@ -221,11 +249,10 @@ document.getElementById('faster').onclick = ()=>{
   audio.playbackRate = rate;
   speedDisplay.textContent = rate.toFixed(1)+'x';
 };
-
 loadTrack(0);
 
 // ===== Kiểm tra cập nhật =====
-const currentVersion = "1.0.0"; // phiên bản hiện tại
+const currentVersion = "1.0.0";
 document.getElementById("checkUpdateBtn").addEventListener("click", async () => {
   const result = document.getElementById("updateResult");
   result.textContent = "Đang kiểm tra...";
@@ -244,9 +271,20 @@ document.getElementById("checkUpdateBtn").addEventListener("click", async () => 
     result.textContent = "Lỗi kết nối, vui lòng thử lại sau.";
   }
 });
+
+// ===== Giả lập số người đang nghe 100–500 =====
+const listenerEl = document.getElementById('listenerCount');
+function randomListeners(){
+  const n = Math.floor(Math.random()*401)+100; // 100–500
+  listenerEl.textContent = n;
+}
+randomListeners();
+setInterval(randomListeners, 5000);
 </script>
 </body>
 </html>
+
+
 
 
 
